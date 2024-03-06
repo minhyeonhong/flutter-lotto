@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lotto/models/lotto.dart';
 import 'dart:math';
+
+import 'package:lotto/services/api_service.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,6 +16,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  Future<LottoModel>? lotto;
+  bool isLoading = true;
   //랜덤 번호 만들기
   List<int> numbers = [];
 
@@ -32,6 +37,19 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  void waitForLottoNo() {
+    setState(() {
+      lotto = ApiService().getToDateNo();
+      isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    waitForLottoNo();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -48,6 +66,24 @@ class _MyAppState extends State<MyApp> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
+                        FutureBuilder(
+                            future: lotto,
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return Text(
+                                  "[${snapshot.data!.drwtNo1},${snapshot.data!.drwtNo2},${snapshot.data!.drwtNo3},${snapshot.data!.drwtNo4},${snapshot.data!.drwtNo5},${snapshot.data!.drwtNo6} + bonus:${snapshot.data!.bnusNo}]",
+                                  style: const TextStyle(
+                                      fontSize: 30, color: Colors.black),
+                                );
+                              } else {
+                                return const Text(
+                                  "데이터 가져오는중...",
+                                  style: TextStyle(
+                                      fontSize: 30, color: Colors.black),
+                                );
+                              }
+                            }),
+                        const SizedBox(height: 20),
                         Text(
                           numbers.toString(),
                           style: const TextStyle(
