@@ -3,13 +3,14 @@ import 'package:lotto/models/lotto.dart';
 import 'dart:math';
 
 import 'package:lotto/services/api_service.dart';
+import 'package:lotto/widgets/qr_scan_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const MaterialApp(home: MyApp()));
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -52,55 +53,71 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        home: Scaffold(
+    return Scaffold(
       backgroundColor: Colors.pink[50],
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Flexible(
-                  flex: 1,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        FutureBuilder(
-                            future: lotto,
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                return Text(
-                                  "[${snapshot.data!.drwtNo1},${snapshot.data!.drwtNo2},${snapshot.data!.drwtNo3},${snapshot.data!.drwtNo4},${snapshot.data!.drwtNo5},${snapshot.data!.drwtNo6} + bonus:${snapshot.data!.bnusNo}]",
-                                  style: const TextStyle(
-                                      fontSize: 30, color: Colors.black),
-                                );
-                              } else {
-                                return const Text(
-                                  "데이터 가져오는중...",
-                                  style: TextStyle(
-                                      fontSize: 30, color: Colors.black),
-                                );
-                              }
-                            }),
-                        const SizedBox(height: 20),
-                        Text(
-                          numbers.toString(),
-                          style: const TextStyle(
-                              fontSize: 30, color: Colors.black),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    FutureBuilder(
+                        future: lotto,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return Text(
+                              "[${snapshot.data!.drwtNo1},${snapshot.data!.drwtNo2},${snapshot.data!.drwtNo3},${snapshot.data!.drwtNo4},${snapshot.data!.drwtNo5},${snapshot.data!.drwtNo6} + bonus:${snapshot.data!.bnusNo}]",
+                              style: const TextStyle(
+                                  fontSize: 20, color: Colors.black),
+                            );
+                          } else {
+                            return const Text(
+                              "데이터 가져오는중...",
+                              style:
+                                  TextStyle(fontSize: 30, color: Colors.black),
+                            );
+                          }
+                        }),
+                    ElevatedButton(
+                      onPressed: () => {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (context) => const QRScanScreen()),
                         ),
-                        const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () => generateRandomNumbers(),
-                          child: const Text('로또 번호 줘'),
-                        ),
-                      ],
+                      },
+                      child: const Text('스캔 하기'),
                     ),
-                  ))
-            ],
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      numbers.toString(),
+                      style: const TextStyle(fontSize: 30, color: Colors.black),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => generateRandomNumbers(),
+                      child: const Text('로또 번호 줘'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ));
+    );
   }
 }
