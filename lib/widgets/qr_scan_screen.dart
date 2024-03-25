@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:lotto/models/lotto.dart';
+import 'package:lotto/services/api_service.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class QRScanScreen extends StatefulWidget {
-  const QRScanScreen({super.key});
+  final Function(Future<LottoModel>) handleScanResult; // 결과값을 전달할 함수를 매개변수로 받음
+
+  const QRScanScreen({Key? key, required this.handleScanResult})
+      : super(key: key);
 
   @override
   QRScanScreenState createState() => QRScanScreenState();
@@ -46,6 +51,20 @@ class QRScanScreenState extends State<QRScanScreen> {
     controller.scannedDataStream.listen((scanData) {
       setState(() {
         result = scanData;
+        if (scanData.code == null &&
+            scanData.code!.contains("http://qr.645lotto.net")) {
+          print("======================여기야=");
+          print(scanData.code);
+          Future<LottoModel> response =
+              ApiService().getQRCodeNo(scanData.code!);
+          // QR코드 스캔 결과를 이전 페이지로 전달
+          widget.handleScanResult(response);
+          // QRScanScreen이 이전 페이지를 호출한 후 종료됨
+          Navigator.pop(context);
+        } else {
+          print("======================여기야=222222");
+          print(scanData.code);
+        }
       });
     });
   }

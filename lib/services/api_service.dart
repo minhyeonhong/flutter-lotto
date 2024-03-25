@@ -29,4 +29,18 @@ class ApiService {
     }
     throw Error();
   }
+
+  Future<LottoModel> getQRCodeNo(String qrURI) async {
+    final url = Uri.parse(qrURI);
+    final response = await http.get(url);
+
+    print("======================여기야=");
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      final dynamic jsonBody = jsonDecode(response.body);
+      return LottoModel.fromJson(jsonBody);
+    }
+    throw Error();
+  }
 }

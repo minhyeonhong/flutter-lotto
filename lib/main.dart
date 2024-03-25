@@ -3,6 +3,7 @@ import 'package:lotto/models/lotto.dart';
 import 'dart:math';
 
 import 'package:lotto/services/api_service.dart';
+import 'package:lotto/widgets/lotto_calculate.dart';
 import 'package:lotto/widgets/qr_scan_screen.dart';
 
 void main() {
@@ -17,7 +18,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Future<LottoModel>? lotto;
+  Future<LottoModel>? lotto, qr_lotto;
   bool isLoading = true;
   //랜덤 번호 만들기
   List<int> numbers = [];
@@ -42,6 +43,13 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       lotto = ApiService().getToDateNo();
       isLoading = false;
+    });
+  }
+
+  // QR코드 스캔 결과를 받는 함수
+  void handleScanResult(Future<LottoModel> result) {
+    setState(() {
+      qr_lotto = result;
     });
   }
 
@@ -70,7 +78,7 @@ class _MyAppState extends State<MyApp> {
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             return Text(
-                              "[${snapshot.data!.drwtNo1},${snapshot.data!.drwtNo2},${snapshot.data!.drwtNo3},${snapshot.data!.drwtNo4},${snapshot.data!.drwtNo5},${snapshot.data!.drwtNo6} + bonus:${snapshot.data!.bnusNo}]",
+                              "${snapshot.data!.drwNo}회차 당첨번호\n[${snapshot.data!.drwtNo1},${snapshot.data!.drwtNo2},${snapshot.data!.drwtNo3},${snapshot.data!.drwtNo4},${snapshot.data!.drwtNo5},${snapshot.data!.drwtNo6} + bonus:${snapshot.data!.bnusNo}]",
                               style: const TextStyle(
                                   fontSize: 20, color: Colors.black),
                             );
@@ -86,10 +94,26 @@ class _MyAppState extends State<MyApp> {
                       onPressed: () => {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                              builder: (context) => const QRScanScreen()),
+                              builder: (context) => QRScanScreen(
+                                  handleScanResult: handleScanResult)),
                         ),
                       },
                       child: const Text('스캔 하기'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (context) => const LottoCalculate()),
+                        ),
+                      },
+                      child: const Text('로또상금 계산하기'),
                     ),
                   ],
                 ),
